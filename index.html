@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GeoLocal Chat</title>
+	<meta name="author" content="Nicola Scotti di Uccio">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+	<link href="http://fonts.googleapis.com/css?family=Headland+One%7COpen+Sans:400,300&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css"></link>
+	<style>
+html,body,#page{
+	height:100%;
+}
+body{
+    font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif;
+	font-size: 14px;
+	height:100%;
+	line-height: 18px;
+	margin: 0;
+	min-height:300px;
+	padding:0;
+}
+#page{
+	position: relative;
+}
+
+#top{
+	background-color: #647687;
+	border-bottom: 1px solid #111a33;
+	color:#fff;
+	font-size:19px;
+	font-weight:bolder;
+	height: 43px;
+	position: relative;
+	width: 100%;
+	z-index: 12;
+}
+#topleft{
+	float:left;
+	padding:10px;
+}
+#topright{
+	background-color:#f00;
+	border-radius:5px;
+	float:right;
+	margin:15px 10px;
+	padding:5px;
+}
+
+#messages{
+	clear: both;
+	min-height: 200px;
+	overflow-y:scroll;
+	padding:0 10px;
+	position:relative;
+	z-index:0;
+}
+#composer{
+	position: fixed;
+	width: 100%;
+	bottom: 0;
+}
+#composer>div{
+	padding:20px;
+}
+table{
+	border-spacing:0;
+	padding:0 10px;
+	width:100%;
+}
+.tdbutton{
+	vertical-align: top;
+	width:80px;
+}
+
+textarea{
+	border: 1px solid #eee;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+	box-shadow: none;
+		-webkit-transition: border linear .2s,box-shadow linear .2s;
+		-moz-transition: border linear .2s,box-shadow linear .2s;
+		-o-transition: border linear .2s,box-shadow linear .2s;
+	transition: border linear .2s,box-shadow linear .2s;
+		-webkit-border-radius: 0;
+		-moz-border-radius: 0;
+	border-radius: 0;
+		font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif;
+	display: inline-block;
+	padding: 6px 6px;
+	font-size: 14px;
+	line-height: 20px;
+	color: #333;
+	width: 100%;
+}
+
+.button {
+    background: #ED5E2F;
+    border: 0px none;
+    color: #FFF;
+    font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    margin:4px 0 0 20px;
+    outline: 0px none;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.button:hover {
+    background: #74A599;
+}
+
+.button:active {
+    background: #F6A953;
+}
+
+
+p.info{
+	margin: 10px 10px 0;
+	padding: 10px;
+}
+.chat{
+	clear: both;
+	margin: 10px 10px 0;
+	padding: 10px;
+	width:70%;
+}
+.me{
+	background-color: #ccc;
+	border-radius: 10px 10px 10px 0;
+	float:right;
+	text-align:right;
+}
+.other{
+	background-color: #A4C400;
+	border-radius: 10px 10px 0;
+	float: left;
+}
+.user{
+	font-weight:bold;
+}
+.time{
+	color: #888;
+}
+.me .time{ text-align:left; }
+.other .time{ text-align:right; }
+
+	</style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+</head>
+<body>
+<h1 style="display:block;height:0;overflow:hidden;position:absolute;width:0;padding:0">GeoLocal Chat</h1>
+<div id="page">
+	<div id="top">
+		<div id="topleft">GeoLocal Chat</div>
+		<div id="topright"></div>
+	</div>
+	<div id="info"></div>
+	<div id="messages">
+	</div>
+	<div id="composer">
+		<table><tr>
+			<td>
+				<textarea class="input textarea" id="composerInput" placeholder="Write a message..." name="body" rows="2"></textarea>
+			</td>
+			<td class="tdbutton">
+				<button id="button" type="submit" value="Reply" class="button" name="send">Reply</button>
+			</td>
+		</tr></table>
+	</div>
+</div>
+<script>
+	var x=document.getElementById("info");
+	var lat = 0, lon = 0, room = 'global';
+
+	function geosuccess(position){
+		lat		= Math.round( ( position.coords.latitude )*10 );
+		lon		= Math.round( ( position.coords.longitude )*10 );
+		room	= ''+lat+','+lon;
+		$('#messages').append('<p class="info">Hi! You are connected from coordinates '+position.coords.latitude.toFixed(3)+','+position.coords.longitude.toFixed(3)+'.</p>');
+	}
+	function geoerror(error){
+		switch(error.code){
+			case error.PERMISSION_DENIED:
+				$('#messages').append('User denied the request for Geolocation.');
+				break;
+			case error.POSITION_UNAVAILABLE:
+				$('#messages').append('Location information is unavailable.');
+				break;
+			case error.TIMEOUT:
+				$('#messages').append('The request to get user location timed out.');
+				break;
+			case error.UNKNOWN_ERROR:
+				$('#messages').append('An unknown error occurred.');
+				break;
+		}
+	}
+
+	if (navigator.geolocation){
+		navigator.geolocation.getCurrentPosition( geosuccess, geoerror );
+	}
+	else{
+		$("#messages").append("<p class='info'>Geolocation is not supported by this browser. Global Chat will be used!</p>");
+	}
+
+
+    $(document).ready(function() {
+		$("#topright").css('background-color','#0ff');
+		var username = 'user'+(''+Math.random()).slice(3,7);
+		var socket = new io.connect();
+
+		socket.on('connect', function() {
+			$("#topright").css('background-color','#0f0');
+			console.log( 'Connected in room: "'+room+'"' );
+			socket.emit( 'locale', room );
+			var h = $('#page').height()-$('#top').height()-$('#composer').height();
+			$('#messages').css('max-height',h+'px');
+			console.log( h );
+		});
+
+		socket.on('disconnect', function() {
+			$("#topright").css('background-color','#f00');
+		});
+
+		socket.on('reply', function(message){
+			console.log( message );
+			var d = new Date();
+			if ( message.user == username ){
+				$('#messages').append('<div class="chat me"><div class="user">ME</div>'+message.content+'<div class="time">'+d.toUTCString()+'</div></div>');
+			}
+			else{
+				$('#messages').append('<div class="chat other"><div class="user">'+message.user+'</div>'+message.content+'<div class="time">'+d.toUTCString()+'</div></div>');
+			}
+		}) ;
+
+		socket.on('info', function(message){
+			$('#messages').append('<p class="info">'+message+'</p>');
+		}) ;
+
+		$('#button').click(function(){
+			var message = {user:username,content:($("#composerInput").val())};
+			socket.emit( 'message', message );
+		});
+	});
+</script>
+</body>
+</html>

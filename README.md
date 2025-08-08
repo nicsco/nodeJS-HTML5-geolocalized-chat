@@ -5,24 +5,24 @@ A simple geolocalized real-time chat application built with **Node.js**, **Socke
 Users are automatically placed into chat rooms based on their approximate latitude and longitude. Each room corresponds to a geographic region, allowing localized conversations.
 
 
-## 🚀 Features
+## Features
 
-- 🌐 Location-based chat rooms
-- 💬 Real-time messaging using WebSockets
-- 🔄 Redis pub/sub for message distribution
-- 📱 Mobile-friendly UI
-- 🎨 Simple and elegant frontend with chat bubbles
-- 💡 Context-aware messages based on coordinates
+- Location-based chat rooms
+- Real-time messaging using WebSockets
+- Redis pub/sub for message distribution
+- Mobile-friendly UI
+- Simple and elegant frontend with chat bubbles
+- Context-aware messages based on coordinates
 
 
-## 📦 Tech Stack
+## Tech Stack
 
 - **Backend**: Node.js, Socket.IO, Redis
 - **Frontend**: HTML5, CSS3, jQuery
 - **Location API**: HTML5 Geolocation API
 
 
-## 🛠 Installation
+## Installation
 
 1. **Clone the repository**
 
@@ -59,7 +59,7 @@ Users are automatically placed into chat rooms based on their approximate latitu
     http://localhost:8000
     ```
 
-## 🌍 How It Works
+## How It Works
 
 - When a user loads the page, the browser asks for their location.
 - Latitude and longitude are rounded and used as a chat room ID (e.g. `419,125`).
@@ -67,7 +67,7 @@ Users are automatically placed into chat rooms based on their approximate latitu
 - Messages are sent using Socket.IO and distributed with Redis pub/sub.
 - The UI updates in real time, with messages styled as "me" or "other" depending on the sender.
 
-## 📁 Project Structure
+## Project Structure
 
 ```php
 .
@@ -76,27 +76,27 @@ Users are automatically placed into chat rooms based on their approximate latitu
 ├── package.json      # Node.js dependencies
 ```
 
-## ⚠️ Known Issues
+## Known Issues
 
 - Global `room` variable may cause cross-client interference (improvement in progress).
 - No message sanitization (XSS protection is recommended).
 - Creates a Redis client per user — may be inefficient at scale.
 
-## ✅ To Do
+## To Do
 
 - [ ] Replace Redis per-client subscriptions with Socket.IO native rooms
 - [ ] Sanitize incoming/outgoing message content
 - [ ] Enhance mobile responsiveness and auto-scroll
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-## 📄 License
+## License
 
 MIT License. See LICENSE file for more info.
 
-## 👤 Author
+## Author
 
 Nicola Scotti di Uccio
 
